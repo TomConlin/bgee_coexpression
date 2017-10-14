@@ -1,0 +1,119 @@
+
+
+0001051 & 0002354 into 0013522
+"hypopharynx" & "subdivision of tube" ->  "cardiac Purkinje fiber"
+	???
+
+0002127 & 0002129 into 0019263
+"inferior olivary complex & "cerebellar cortex" -> "gray matter of hindbrain"
+	YES
+
+0004736  into  0000075 !
+"metanephric glomerulus" -> "subdivision of skeletal system"
+	NO too general
+
+0001119 & 0001120 into 0001118
+	"right|left lobe of thyroid gland"  -> "lobe of thyroid gland"
+	YES
+
+0001728 & 0001737 into 0000072
+"nasopharynx" & "larynx" -> "proximo-distal subdivision of respiratory tract"
+	PROBABLY
+
+0004533 & 0004534 into 0000473
+"left testis" & "right testis" -> "testis"         YES   
+                               \
+                                  all_into 000991  NO (breaks gender)
+                               /
+0002118 & 0002119 into 0000992
+"right ovary" & "left ovary" ->  "ovary"           YES
+
+0001906 & 0002736 into 0015233
+"subthalamic nucleus" & "lateral nuclear group of thalamus" -> "nucleus of dorsal thalamus"
+	PROBABLY
+
+0004262 into 0001511 !
+"upper leg skin" -> "skin of leg"
+	# YES
+
+0000995 & 0000996 & 0003889* into 0013515   (fallopian tubes already merged)
+"uterus" & "vagina" & "fallopian tube" -> subdivision of oviduct"
+	MAYBE NOT (too corse?  expressed in reproductive system) 
+
+0002080 & 0002084 into 0002082  !		                    
+                       0002082 & 0002081 into 0004151
+
+"heart right|left ventricle" -> "cardiac ventricle"
+"cardiac ventricle" & "cardiac atrium" -> "cardiac chamber"
+	PROBABLY YES (expeessed in heart)
+
+0001157 & 0001159 into 0000168
+"transverse colon" & sigmoid colon" -> "proximal-distal subdivision of colon"
+	MAYBE (would plain UBERON:0001155	"colon" be better? )
+
+
+0007106 & 0002331 & 0002450 into 0000478 (0002331 small)
+"chorionic villus" & "umbilical cord" & "decidua" -> "extraembryonic structure"
+	PROBABLY
+
+
+0001021 & 0004904 into 0000122  (0004904 small)
+"nerve" & "neuron projection bundle connecting eye with brain" -> "neuron projection bundle"
+	MAYBE NOT (nerve is way more general)
+
+0008952 into 0008948 !
+             0008948 & 0008949 into 0000101
+"upper lobe of left lung" -> "upper lobe of lung" 
+"upper lobe of lung"  & "lower lobe of lung" -> "lobe of lung"
+	YES (I would work with expressed in lungs)
+
+0001765 into 0003244 !
+             0003244 & 0003911 into 0010371
+"mammary duct" -> "epithelium of mammary gland"
+"epithelium of mammary gland" & "choroid plexus epithelium" -> "ecto-epithelium"
+	MAYBE (can I get a second opinion)
+
+0005200 into 0001911 !
+             0001911 & 0001817 into 0002365
+"thoracic mammary gland" -> "mammary gland" 
+	YES
+"mammary gland" & "lacrimal gland" -> "exocrine gland"
+	PROBABLY NOT
+
+
+0001379 into 0001377 !
+             0001377 & 0001383 into 0003663
+"vastus lateralis" -> "quadriceps femoris"
+"quadriceps femoris" & "muscle of leg" -> "hindlimb muscle"
+	YES
+
+0004720 & 0002245 into 0002749 (already? bined)
+"cerebellar vermis" & "cerebellar hemisphere" -> "regional part of cerebellar cortex"
+	SURE
+
+0000010 & 0001017 into 0011216
+"peripheral nervous system" & "central nervous system" -> "organ system subdivision"
+	NO 
+
+0000014 & 0009853 into 0034944 
+"zone of skin" & "body of uterus" -> "zone of organ"
+	NO
+
+0006922 into 0004801 ! 
+"cervix squamous epithelium" -> "cervix epithelium"
+	YES
+
+0000082 & 0000081 into 0002113 (interesting neiborhood)
+"adult mammalian kidney" & "metanephros" -> "kidney"
+	YES
+
+
+0001255 & 0001264 into 0002075
+"urinary bladder" & "pancreas" - > "viscus"
+	NO
+
+0001296 & 0004797 into 0004923
+"myometrium" & "blood vessel layer" - > "organ component layer"
+	NO
+
+
