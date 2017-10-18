@@ -1,0 +1,44 @@
+UBERON:0008188|UBERON:0002384	# connective tissue
+UBERON:0004502|UBERON:0001134	# skeletal muscle tissue
+UBERON:0002581|UBERON:0000200	# gyrus
+UBERON:0002771|UBERON:0000200	# gyrus
+UBERON:0002661|UBERON:0000200	# gyrus
+UBERON:0002702|UBERON:0000200	# gyrus
+UBERON:0004167|UBERON:0000200	# gyrus 
+UBERON:0002436|UBERON:0013529	# Brodmann area
+UBERON:0006483|UBERON:0013529	# Brodmann area
+UBERON:0013540|UBERON:0013529	# Brodmann area
+UBERON:0013541|UBERON:0013529	# Brodmann area
+UBERON:0013554|UBERON:0013529	# Brodmann area
+UBERON:0007808|UBERON:0002384	# connective tissue
+UBERON:0002190|UBERON:0002384	# connective tissue
+UBERON:0003126|UBERON:0000117	# respiratory tube
+UBERON:0002185|UBERON:0000117	# respiratory tube
+UBERON:0005384|UBERON:0004814	# upper respiratory tract epithelium 
+UBERON:0001951|UBERON:0004814	# upper respiratory tract epithelium
+UBERON:0004801|UBERON:0004804	# oviduct epithelium
+UBERON:0006922|UBERON:0004804	# oviduct epithelium
+UBERON:0001876|UBERON:0005401	# cerebral hemisphere gray matter
+UBERON:0002476|UBERON:0005401	# cerebral hemisphere gray matter
+UBERON:0002477|UBERON:0005401	# cerebral hemisphere gray matter
+UBERON:0001873|UBERON:0009663	# telencephalic nucleus
+UBERON:0001874|UBERON:0009663	# telencephalic nucleus
+UBERON:0001875|UBERON:0009663	# telencephalic nucleus
+UBERON:0001882|UBERON:0009663	# telencephalic nucleus
+UBERON:0001871|UBERON:0016526	# lobe of cerebral hemisphere
+UBERON:0001872|UBERON:0016526	# lobe of cerebral hemisphere 
+UBERON:0002021|UBERON:0016526	# lobe of cerebral hemisphere
+UBERON:0016525|UBERON:0016526	# lobe of cerebral hemisphere
+UBERON:0001476|UBERON:0014892	# skeletal muscle organ
+UBERON:0001509|UBERON:0014892	# skeletal muscle organ
+UBERON:0001160|UBERON:0009870	# zone of stomach
+UBERON:0001161|UBERON:0009870	# zone of stomach
+UBERON:0001162|UBERON:0009870	# zone of stomach
+UBERON:0001166|UBERON:0009870	# zone of stomach
+UBERON:0004087|UBERON:0013768	# great vessel of heart
+UBERON:0000947|UBERON:0013768	# great vessel of heart
+UBERON:0000044|UBERON:0001800	# sensory ganglion
+UBERON:0001675|UBERON:0001800	# sensory ganglion
+
+
+

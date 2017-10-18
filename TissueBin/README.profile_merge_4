@@ -1,0 +1,169 @@
+### Forth profile merge 
+
+- ontobio ogr seems ideal. fails with broken venv/dependency w/ prefixcommons
+
+- protoge loads uberon.owl & reasoner after I double memory  memory allocation
+  it is slow , no ready acess to both termid & label at the same time
+  freezes my machine after about an hour (work was lost).
+
+- OLS (ontolgy lookup service) well it is better than protege ...
+  api does not have path(s) from term to root(s) handy
+
+- just want to show I did try to not do what I always end up doing anyway
+
+So we have an expressed set, want ancestors also in the expressed set.
+a few lines of shell script later
+
+./ancestor_path.awk uberon_subclass_class.tab expression_profile_lables.txt
+
+
+UBERON:0000922	UBERON:0000468	"embryo"	"multicellular organism"
+UBERON:0001507	UBERON:0014892	"biceps brachii"	"skeletal muscle organ"
+UBERON:0001507	UBERON:0001630	"biceps brachii"	"muscle organ"
+UBERON:0000043	UBERON:0002384	"tendon"	"connective tissue"
+UBERON:0001103	UBERON:0001630	"diaphragm"	"muscle organ"
+UBERON:0014892	UBERON:0001630	"skeletal muscle organ"	"muscle organ"
+UBERON:0003663	UBERON:0014892	"hindlimb muscle"	"skeletal muscle organ"
+UBERON:0003663	UBERON:0001630	"hindlimb muscle"	"muscle organ"
+UBERON:0004263	UBERON:0000014	"upper arm skin"	"zone of skin"
+UBERON:0004511	UBERON:0001134	"skeletal muscle tissue of rectus abdominis"	"skeletal muscle tissue"
+UBERON:0004511	UBERON:0002385	"skeletal muscle tissue of rectus abdominis"	"muscle tissue"
+UBERON:0007023	UBERON:0000468	"adult organism"	"multicellular organism"
+UBERON:0001831	UBERON:0001044	"parotid gland"	"saliva-secreting gland"
+UBERON:0002418	UBERON:0002384	"cartilage tissue"	"connective tissue"
+UBERON:0001621	UBERON:0001637	"coronary artery"	"artery"
+UBERON:0001870	UBERON:0005401	"frontal cortex"	"cerebral hemisphere gray matter"
+UBERON:0001416	UBERON:0000014	"skin of abdomen"	"zone of skin"
+UBERON:0015593	UBERON:0000200	"frontal gyrus"	"gyrus"
+UBERON:0007318	UBERON:0001638	"saphenous vein"	"vein"
+UBERON:0001013	UBERON:0002384	"adipose tissue"	"connective tissue"
+UBERON:0001511	UBERON:0000014	"skin of leg"	"zone of skin"
+UBERON:0006566	UBERON:0002349	"left ventricle myocardium"	"myocardium"
+UBERON:0000474	UBERON:0000467	"female reproductive system"	"anatomical system"
+UBERON:0001323	UBERON:0001021	"tibial nerve"         (leg nerve)	"nerve"
+UBERON:0001554	UBERON:0000014	"skin of hip"	"zone of skin"
+UBERON:0001134	UBERON:0002385	"skeletal muscle tissue"	"muscle tissue"
+UBERON:0001135	UBERON:0002385	"smooth muscle tissue"	"muscle tissue"
+UBERON:0004736	UBERON:0000074	"metanephric glomerulus"	"renal glomerulus"
+UBERON:0001614	UBERON:0001637	"superficial temporal artery"	"artery"
+UBERON:0002000	UBERON:0014892	"gluteal muscle"	"skeletal muscle organ"
+UBERON:0002000	UBERON:0001630	"gluteal muscle"	"muscle organ"
+UBERON:0005351	UBERON:0002749	"paraflocculus"	"regional part of cerebellar cortex"
+UBERON:0001388	UBERON:0003663	"gastrocnemius"	"hindlimb muscle"
+UBERON:0001388	UBERON:0014892	"gastrocnemius"	"skeletal muscle organ"
+UBERON:0001388	UBERON:0001630	"gastrocnemius"	"muscle organ"
+UBERON:0002250	UBERON:0001637	"popliteal artery"	"artery"
+UBERON:0004811	UBERON:0006955	"endometrium epithelium"	"uterine epithelium"
+UBERON:0004811	UBERON:0004804	"endometrium epithelium"	"oviduct epithelium"
+UBERON:0006955	UBERON:0004804	"uterine epithelium"	"oviduct epithelium"
+UBERON:0002483	UBERON:0002384	"trabecular bone tissue"	"connective tissue"
+UBERON:0034908	UBERON:0014892	"scapular muscle"	"skeletal muscle organ"
+UBERON:0034908	UBERON:0001630	"scapular muscle"	"muscle organ"
+UBERON:0007610	UBERON:0001637	"tibial artery"	"artery"
+
+All of the profile terms and their ancestors which are also profile terms.
+when a term has multiple ancestors some have to _not_ be chosen to merge
+
+ - merging into early, should be less ontological distance (less intent drift) 
+ - merging into later, intermediate terms should also go the the same place
+
+manualy delete the lines I choose not to keep
+
+# sanity checks. term is not merged twice
+wc -l < profile_merge_IV.tab
+28
+cut -f1  profile_merge_IV.tab | sort -u | wc -l
+28
+
+# check that when multiple term are merged into one they agree, enough,
+sort -k2,2 profile_merge_IV.tab
+
+looks okay, would be nice to learn enough to say if it is better to 
+group by things like mucosa  i.e  is it more useful if mucous producing tissue 
+be grouped together or grouped with the organ it is in;  
+but that is type of question opinions flock to.
+
+cut -f 1,2 profile_merge_IV.tab | tr '\t' '|' > supertype_tissue_IV.unl
+ 
+
+Since previous profile merges will have used the set we are merging further
+need to go back and update the merge targets
+
+ awk -F'|' '{child[$1];parent[$2]}END{for(c in child)if(c in parent)print c}' tissue_bin.unl_new 
+UBERON:0000043
+UBERON:0001621
+UBERON:0001870
+UBERON:0015593
+UBERON:0001013
+UBERON:0001511
+UBERON:0006955
+UBERON:0034908
+
+e.g. 
+
+grep UBERON:0000043 supertype_tissue_I*.unl
+supertype_tissue_III.unl:UBERON:0008188|UBERON:0000043	# tendon
+supertype_tissue_IV.unl:UBERON:0000043|UBERON:0002384
+
+merge 3 moved something to tendon and merge 4 moves it to connective tissue
+retroactivlu make merge 3 target connective tissue.
+
+# collect the merge directives
+cat supertype_tissue_I*.unl | cut -f1 |sort -u > tissue_bin.unl
+
+
+awk 'BEGIN{printf("sed ")}/^UBERON:/{printf("s|%s|g;", $0)}END{print " geneid_tissueid_exists.tab|sort -u > geneid_bintissueid_exists.tab"}' tissue_bin.unl > tissue_bin.sourceme
+
+# put quotes around sed command (being lazy)
+
+# fresh input
+cut -f1,3,5  ../Homo_sapiens_expr_simple.tsv > geneid_tissueid_exists.tab
+
+
+time source tissue_bin.sourceme
+real	8m0.890s
+
+time keeps creeping up
+
+wc -l < geneid_bintissueid_exists.tab
+6,541,858 
+
+wc -l   < ../Homo_sapiens_expr_simple.tsv
+8,884,623 
+
+couple million expression results made redundant
+
+# get an _ordered_ list of tissues to serve as an index into the profile vector
+grep present geneid_bintissueid_exists.tab  | cut -f2 | sort |uniq -c | sort -nr | cut -c9- > tissue_index.txt
+
+
+wc -l < tissue_index.txt
+211 (down from 238  (down from 266 (down from 312)))
+
+have collapsed 101 tissues in the profile
+
+# get an ordered list if genes to serve as an index into the vector of vertors
+grep present geneid_bintissueid_exists.tab| cut -f1 |uniq  > geneid_index.txt
+
+wc -l < geneid_index.txt
+59169   ... yep
+
+
+julia  ./BGEE_allpairs.jl
+Begin	2017-10-17T23:12:28.901
+data init	2017-10-17T23:12:41.256
+profiles generated	2017-10-17T23:12:44.155
+0	2017-10-17T23:12:44.324 yeilds 0
+1000	2017-10-17T23:14:27.136 yeilds 12822
+...
+59169	2017-10-18T00:11:38.148 yeilds 829,347  (profile merge run had 803,356)
+
+gained 25k
+
+
+grep -f faensgid.list bgee-assocition.tab
+"ENSG00000154710	ENSG00000221829"	78
+
+I was hoping for more
+
+
