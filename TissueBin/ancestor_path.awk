@@ -1,16 +1,9 @@
 #! /usr/bin/gawk -f
 
-# uberon_subclass_class.tab
+# called as
+# ./ancestor_path.awk uberon_subclass_class.tab expression_profile_lables.txt
+# 
 
-function ancestor(up, here, path){
-	leaf = here
-	there = here
-	while(there in up){
-		here = there
-		path[there] = count+=1
-		there = up[here]
-	}
-}
 
 BEGIN{FS="\t"}
 
@@ -20,7 +13,6 @@ FNR!=NR {name[$1] = $2}
 
 END{
 	for(node in name){
-	  	# printf("%s",node )
 		there = node
 		while(there in parent_of){
 			here = there

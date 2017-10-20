@@ -12,7 +12,7 @@ grep "<http://purl.obolibrary.org/obo/UBERON_.* <http://www.w3.org/2000/01/rdf-s
 # there are two condiditions I am consider collapsing tissue bins
 
  - a tissue is a subclass of another expressed tissue
- - expressed tissues have a common parent and we subsitute that instead
+ - two expressed tissues have a common parent and we subsitute that instead
 
 
 # get the set of UBERON tissues with expression from BGEE
@@ -33,7 +33,6 @@ wc -l uberon_subclass_class_bgee.tab uberon_bgee_tissue.txt
 
 # get the counts of all the tissues
 awk -F'\t' '{count[$3]++}END{for(t in count)print t"\t" count[t]}' ../Homo_sapiens_expr_simple.tsv  > tissue_all_count.tab
-
 
 # check if any expressed tissue is the parent class of any other expressed tisue
 
@@ -85,12 +84,10 @@ UBERON:0006920 UBERON:0006914	"esophagus squamous epithelium" 	-> "squamous epit
 
 # have the set I want to change written out as 'supertype_tissue.sourceme'
 # the translation could be written into the ingest bit I want to 
-# look andd futz with it in stages first
+# look and futz with it in stages first
 
-# warning this god awful slow and inefficent use of a computer
+# this is god awful slow (dont do it this way again)
 source supertype_tissue.sourceme
-
-
 
 # get the counts of the first binned  tissues
 awk -F'\t' '{count[$3]++}END{for(t in count)print t"\t" count[t]}' ../Homo_sapiens_expr_binned.tsv  > tissue_binned_count.tab
@@ -117,7 +114,7 @@ diff tissue_all_count.tab tissue_binned_count.tab | grep "^<" | wc -l
 
 32
 
-32 tissues down to 13 kept 
+32 tissues down to 13 kept 19 collapsed
 
 
 cut -f1,3  ../Homo_sapiens_expr_simple.tsv | sort -u | wc -l
@@ -131,7 +128,6 @@ cut -f1,3  Homo_sapiens_expr_binned.tsv  | sort -u | wc -l
 8,126,747   # effectivly collapse over 700k gene-tiussue without "loosing" them
 
 
-
 ################################################################################
 # check if any expressed tissurs have a common parent.
 
@@ -143,6 +139,7 @@ cut -f2 uberon_subclass_class_bgee.tab | sort | uniq -c | sort -nr | wc -l
 
 cut -f3  ../Homo_sapiens_expr_simple.tsv | sort -u  > uberon_bgee_tissue_binned.txt
 
+
 awk -F'\t' 'NR==FNR{parent[$1]=$2}NF!=FNR{if(index(merge[parent[$1]], $1) < 1)merge[parent[$1]]=merge[parent[$1]] " " $1}END{for(m in merge){if(length(merge[m]) > 15 && length(merge[m]) < 115)print m,"|", merge[m]}}' uberon_subclass_class_bgee.tab uberon_bgee_tissue_binned.txt | awk '{ print length(), $0 | "sort -n" }' - | cut -f2- -d ' ' 
 
 ################################################################################
@@ -153,7 +150,7 @@ sinse wepress terms includ some high level terms i.e. "whole organism"
 I dropped any that had more than a hanful of direct decendents since those 
 merging into would represent inntroducing too much ambiguity.
 
-subgraphs NOT to merge include terms with multiple parentage
+subgraphs NOT to consider merging include terms with multiple parentage
 and terms embedded in parts of the graph with rich structure.
 
 candidates to merge include subgraphs where both the parent and child are 
@@ -161,35 +158,346 @@ expressed terms in bgee
 BUT! look carefully because we already did one pass with that goal in mind 
 and some candidates were rejected for reasons.
 
-the main subgraphs to consider are a pair of terms (preferably leaf nodes)
+The main subgraphs to consider are a pair of terms (preferably leaf nodes)
 with a single non expressed term parent.
 
-and as it turns out sometimes these subgraphs form chains so consider 
+As it turns out, sometimes these subgraphs form chains so consider 
 merging subgraphs with grandparents as well.
 
-other considerations are expressed term with low oo high carcnality
-low cardnality favors merging because there is not much signal to dilute 
-but still  costs  as much work as a strong signal.
+Other considerations are expressed term with low or high cardnality.
 
-high cardnality (>60k) means the expressed term 
+Low cardnality favors merging because there is not much signal to dilute 
+but still costs  as much work as a strong signal.
+
+High cardnality (>60k) means the expressed term 
 has already see a round of merging. prodeed with caution.
 
 -------------------------------------------------------------
 
-to make semantic sense of the tatically chosen subgraphs we need the labels 
+To make semantic sense of the tatically chosen subgraphs we need the labels 
 
- 
 grep "<http://purl.obolibrary.org/obo/UBERON_.* <http://www.w3.org/2000/01/rdf-schema#label> " uberon.nt  | cut -f1,3- -d ' ' | sed 's|<http://purl.obolibrary.org/obo/||g;s|>||g;s| |\t|;s|_|:|g' | cut -f1 -d "^" > uberon_term_label.tab 
 
 
+Once we have a list of tissue terms to collapse
+isolate the bits we care about and leave the rest 
 
+cut -f 1,3 Homo_sapiens_expr_binned.tsv  | sort -u >  geneid_tissueid_binII.txt 
+
+wc -l geneid_tissueid_binII.txt8126747 geneid_tissueid_binII.txt
+8,126,747  (this is the first 700k reduction)
+
+time source supertype_tissue_II.sourceme
+
+real	2m18.859s
+user	2m20.760s
+sys	0m1.596s
+
+that is not so bad this time 
+
+ wc -l  < geneid_tissueid_binIII.txt
+7,419,932 
+
+about 1.4M total reduction in gene+tissue to go into the profiles
+################################################################################
+
+cut -f2 geneid_tissueid_binIII.txt | sort | uniq -c | sort -nr | cut -c 8- > tissue_bin_III.txt
+
+wc -l tissue_bin_III.txt
+266 tissue_bin_III.txt
+
+about fourty fewer tissues per vector
+
+
+cut -f1 geneid_tissueid_binIII.txt | uniq > geneid.txt
+ 
+wc -l geneid.txt 
+59171 geneid.txt
+
+as expected gene count is unchanged 
+
+by confirming the uniq count is the same as a sorted unique count (it is)
+we can know the list of gene tissues is given as: 
+all tissue for one gene before another gene begins
 
 ################################################################################
 
+aside 
+
+The other dimension we can collapse if need be is along "gene" identifiers 
+we currently have 60K identifiers but we do not expect there to be that many 
+offical gene symbols, 
+so there must be cases where the identifers for 
+different transcripts, isoforms, fragments or whatever can be merged.
+
+I would prefer to just group them when they are rendered  
+leaving sequence provanance intact but it is something to keep in mind.
+
+#####################################################################
+MINI REDO: 
+
+B/C also need presense/absence  (to eliminate absence)
+
+# muck out big files and half measures from above
+# combine the supertype_tissue_I.tab & supertype_tissue_II.tab files into tissue_bin.unl
+
+# make tissue_bin.unl consistent (no destinations are also sources)
+
+awk '{printf("s|%s|g;", $0)}' tissue_bin.unl > tissue_bin.sourceme
+
+cut -f1,3,5  ../Homo_sapiens_expr_simple.tsv > geneid_tissueid_exists.tab
+
+# decorate the `tissue_bin.sourceme` with sed command and filenames
+# have it write unique results to `geneid_bintissueid_exists.tab`
+# the absense will be a bit of noise
+
+time source tissue_bin.sourceme
+
+real	3m40.089s
 
 
+cut -f1 -d' ' geneid_bintissueid_exists.tab | wc -l
+7,609,758
 
-################################################################################
+# w/o absent 
+cut -f1,2  geneid_bintissueid_exists.tab | sort -u | wc -l
+7,419,933
+ 
+about the same (I bet the column header is back in, yep last row) 
+will get filtered with "present"
+
+# get an ordered list of tissues to serve as an index into the profile vector
+grep present geneid_bintissueid_exists.tab  | cut -f2 | sort |uniq -c | sort -nr | cut -c9- > tissue_index.txt
+
+wc -l < tissue_index.txt
+266 tissue_index.txt
 
 
+# get an ordered list if genes to serve as an index into the vector of vertors
+grep present geneid_bintissueid_exists.tab| cut -f1 |uniq  > geneid_index.txt
 
+wc -l < geneid_index.txt
+59169 geneid_index.txt
+
+#################################################
+make a standalone julia script 'BGEE_allpairs.jl' 
+to build the profiles and make pairwise comparisons.
+ 
+julia  ./BGEE_allpairs.jl
+Begin	           2017-10-16T 03:40:59.273
+data init	       2017-10-16T 03:41:12.743
+profiles generated 2017-10-16T 03:41:16.297
+0	               2017-10-16T 03:41:16.471 yeilds 0
+...
+59169	           2017-10-16T04:45:21.525 yeilds 795149
+
+just over an hour (inc read/write, building profiles etc)
+
+head bgee-assocition.tab 
+"ENSG00000233547	ENSG00000278075"	78
+"ENSG00000187514	ENSG00000248643"	81
+"ENSG00000161970	ENSG00000220842"	81
+"ENSG00000239617	ENSG00000278047"	81
+"ENSG00000169627	ENSG00000272894"	81
+"ENSG00000161955	ENSG00000280130"	81
+"ENSG00000090273	ENSG00000266910"	81
+"ENSG00000274090	ENSG00000277499"	3
+"ENSG00000224711	ENSG00000242703"	2
+"ENSG00000249590	ENSG00000280987"	81
+
+
+grep -f faensgid.list bgee-assocition.tab 
+"ENSG00000154710	ENSG00000221829"	88
+
+
+WooHoo! a single honest result.
+
+#############################################################################
+
+The tissues I collapsed so far were taticaly chosen by their local structure
+then confirmed (or not) by looking at what they were. 
+
+There may well be another set to merge just looking at what they are 
+reguardless of their local UBERON graph structure.
+
+
+We have our binned tussues in 'tissue_index.txt' (ordered by usage) 
+We have subclass <- superclass   in 'uberon_subclass_class.tab'
+
+Since including subclasses of expressed terms was mostly unhelpful, skip them.
+
+sed 's|\(.*\)|^\1\t|' tissue_index.txt > exp_tissue.regex > exptissue_parenttissue.txt
+grep -f exp_tissue.regex uberon_subclass_class.tab > exptissue_parenttissue.txt 
+
+wc -l exptissue_parenttissue.txt 
+434 exptissue_parenttissue.txt  (and they are all unique pairs)
+
+266 expressed terms have 434 parent terms (
+
+cut -f2 exptissue_parenttissue.txt | sort | uniq -c | sort -nr
+     21 UBERON:0010314
+     21 UBERON:0004120
+     17 UBERON:0004121
+     17 UBERON:0002616
+     14 UBERON:0000064
+     12 UBERON:0005156
+     12 UBERON:0004921
+      8 UBERON:0004119
+      7 UBERON:0013765
+      7 UBERON:0010313
+      7 UBERON:0000062
+      6 UBERON:0015212
+      5 UBERON:0013529
+      5 UBERON:0000479
+      5 UBERON:0000077
+      4 UBERON:0016526
+      4 UBERON:0013522
+      4 UBERON:0009870
+      4 UBERON:0009663
+      4 UBERON:0000344
+      3 UBERON:0015593
+      3 UBERON:0012275
+      3 UBERON:0005401
+
+Collapsing into Parents of many expressed terms would loose to much informmation 
+also meand ther will be too vague e.g "organ"
+
+dropping parents with more than 10  ...no  5  terms 
+
+egrep -v "UBERON:0010314|UBERON:0004120|UBERON:0004121|UBERON:0002616|\
+UBERON:0000064|UBERON:0005156|UBERON:0004921|UBERON:0004119|UBERON:0013765|\
+UBERON:0010313|UBERON:0000062|UBERON:0015212" exptissue_parenttissue.txt > exptissue_parenttissue_F1.txt
+
+wc -l < exptissue_parenttissue_F1.txt
+285
+
+unique parents
+cut -f2 exptissue_parenttissue_F1.txt | sort -u | wc -l
+202
+
+merging into the parent of a single expressed term won't help unless we 
+repeat the process a number of times to converge.  
+(but I want to do as little editing as possible, less to justify)
+
+cut -f2 exptissue_parenttissue_F1.txt | sort | uniq -c | sort -n | grep "^  *1" | wc -l 
+152
+
+cut -f2 exptissue_parenttissue_F1.txt | sort | uniq -c | sort -n | grep "^  *1" > singelton_parents.txt
+
+
+cut -f2 exptissue_parenttissue_F1.txt | sort | uniq -c | sort -n | grep " *1"
+
+
+(or the parent is also an expressed term we have see before) 
+
+awk -F'\t' '{child[$1];parent[$2]}END{for(c in child)if(c in parent)print c}' exptissue_parenttissue_F1.txt > pc_parent.txt
+
+grep -f pc_parent.txt singelton_parents.txt 
+
+singelton parent-childs
+UBERON:0000014		"zone of skin"
+UBERON:0000043		"tendon"
+UBERON:0001134		"skeletal muscle tissue"
+UBERON:0001630		"muscle organ"
+UBERON:0001637      "artery"
+UBERON:0002385		"muscle tissue"
+UBERON:0004801		"cervix epithelium"
+UBERON:0007616		"layer of synovial tissue"
+
+Most of those above look like great terms to hold on
+
+# non-singelton parent-childs
+UBERON:0000468   	"multicellular organism"         OMIT
+UBERON:0001013   	"adipose tissue" 
+######################################################
+
+Dropping the singeltons which are not both parents and childs
+
+grep -v -f pc_parent.txt singelton_parents.txt | wc -l
+144
+
+grep -v -f pc_parent.txt singelton_parents.txt |cut -c9- > strict_singelton_parents.txt
+
+grep -v -f strict_singelton_parents.txt exptissue_parenttissue_F1.txt  > exptissue_parenttissue_F2.txt
+
+
+# we have tissue names in 'uberon_term_label.tab'
+# note the lables arerary have quotes embedded so clean them up
+
+awk -F'\t' 'BEGIN{print "digraph{rankdir=LR"}FNR==NR{name[$1]=$2}\
+FNR!=NR{print "\"" $2 "\\n" name[$2]"\"-> \"" $1 "\\n" name[$1] "\";"}END{print "}"}' uberon_term_label.tab exptissue_parenttissue_F2.txt | tr -s '"'| sed 's|\\n"|\\n|g' > exptissue_parent_II.gv
+
+dot -Tpng exptissue_parent_II.gv > exptissue_parent_II.png
+
+that looks pretty actionable,  most parents have multiple children
+
+
+look at the graph png, search for words in the .gv file and paste those lines 
+into the (empty) supertype_tissue_III.tab and rearrange them 
+
+
+cat supertype_tissue_I*.unl | cut -f1 |sort -u > tissue_bin.unl
+
+# a couple of parents in set one, get the grandparents from set two
+
+awk -F'|' '{child[$1];parent[$2]}END{for(c in child)if(c in parent)print c}' tissue_bin.unl 
+# shows no parents are also children
+
+awk 'BEGIN{printf("sed ")}{printf("s|%s|g;", $0)}END{print " geneid_tissueid_exists.tab  | sort -u > geneid_bintissueid_exists.tab
+"}' tissue_bin.unl > tissue_bin.sourceme
+
+# fresh meat
+cut -f1,3,5  ../Homo_sapiens_expr_simple.tsv > geneid_tissueid_exists.tab
+
+put sed quotes in the sourceme file delete nogus empth substittion (blank line?)
+
+# update the tissue for our profile
+
+time source tissue_bin.sourceme
+
+real	6m35.712s
+
+# get an _ordered_ list of tissues to serve as an index into the profile vector
+grep present geneid_bintissueid_exists.tab  | cut -f2 | sort |uniq -c | sort -nr | cut -c9- > tissue_index.txt
+
+wc -l < tissue_index.txt
+238  (down from 266 (down from 312))
+
+# get an ordered list if genes to serve as an index into the vector of vertors
+grep present geneid_bintissueid_exists.tab| cut -f1 |uniq  > geneid_index.txt
+
+wc -l < geneid_index.txt
+59,169  just checking
+
+
+####################################
+julia  ./BGEE_allpairs.jl
+
+Begin	2017-10-16T 19:55:39.962
+data init	2017-10-16T19:55:54.835
+
+profiles generated	2017-10-16T19:55:58.348
+0	2017-10-16T19:55:58.535 yeilds 0
+1000	2017-10-16T19:57:56.756 yeilds 10782
+...
+59169	2017-10-16T 21:04:14.592 yeilds 803356
+#############################################
+
+grep -f faensgid.list bgee-assocition.tab 
+
+"ENSG00000154710	ENSG00000221829"	84
+
+alas still just the one , and it has four fewer issues than before
+
+Going from profiles with 266 down to 238 tissues  (dropped 28)
+increases associations from  795,149 to 803,356   (gained 8,207)
+
+
+###############################################
+###############################################
+###############################################
+
+these bottom up (one step) merges are nearing diminishing returns 
+try a fourth pass that admits merges more than one hop away
+
+Move to document README
