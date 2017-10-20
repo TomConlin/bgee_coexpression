@@ -185,7 +185,7 @@ But I am
 
 that is too many (everything gets connected close to ontology roots)
 stopping at the first path intersection halves the results (17,087)
-but ruins the point of having multiple parents.
+but ruins the point of ontology terms having multiple parents.
 
 # what are the most common path intersection points?
 ./ancestor_path_intersect.awk uberon_subclass_class.tab  tissue_index.txt  | less  | cut -f3 | sort | uniq -c | sort -nr | head -20
@@ -287,4 +287,167 @@ grep -f faensgid.list bgee-assocition.tab
 "ENSG00000154710	ENSG00000221829"	78
 
 No change w.r.t FA genes
+
+####################################################
+
+Jaccard > 90% leads to far far too many associations
+Jaccard >= 99%  more than triple  (3.67X)
+
+Julia  ./BGEE_allpairs.jl
+Begin	2017-10-20T09:50:47.444
+data init	2017-10-20T09:51:00.143
+profiles generated	2017-10-20T09:51:03.075
+0	2017-10-20T09:51:03.242 yeilds 0
+1000	2017-10-20T09:53:02.561 yeilds 123298
+2000	2017-10-20T09:55:04.609 yeilds 253043
+...
+59000	2017-10-20T11:25:26.27 yeilds 3573543
+59169	2017-10-20T11:25:26.299 yeilds 3573592
+
+
+grep -f faensgid.list bgee-assocition.tab | wc -l
+118
+
+WHOOHOO!
+
+that is a wrap.
+
+---------------------------------------------------------------------
+
+grep -f faensgid.list bgee-assocition.tab  | tr -d '"' >  fa_bgee_resultJ99.txt
+
+# Are there any hits strictly with in FA?
+
+awk 'FNR==NR{fa[$1]}{if($1 in fa && $2 in fa) print}' faensgid.list fa_bgee_resultJ99.txt
+
+# aparently not.  
+# rerange so fa gene is first
+
+awk 'FNR==NR{fa[$1]}FNR!=NR{if($2 in fa)print $2"\t"$1; else print $1"\t"$2}' faensgid.list fa_bgee_resultJ99.txt > fa_bgee_resultJ99.tab
+
+cat ../ensgid_symbol_hgnc.yaml | tr -d " {}" | tr ':' '\t' | tr "," '\n' | grep -v "^$" > ensgid_symbol.tab
+
+
+cat ../ncbi_symbol_hgnc.yaml | tr -d " {}'" | tr ':' '\t' | tr "," '\n' | grep -v "^$" > symbol_ncbi.tab
+
+awk 'FNR==NR{sym[$1]=$2}FNR!=NR{print sym[$1] "\t" (($2 in sym)?sym[$2]:$2)}' ensgid_symbol.tab fa_bgee_resultJ99.tab | sort | awk 'FNR==NR{ncbi[$2]=$1}FNR!=NR{print $0 "\thttps://www.ncbi.nlm.nih.gov/gene/" ncbi[$2]}' symbol_ncbi.tab -
+ 
+CENPS	GTSE1	https://www.ncbi.nlm.nih.gov/gene/51512
+CENPS	KBTBD2	https://www.ncbi.nlm.nih.gov/gene/25948
+CENPS	MPHOSPH6	https://www.ncbi.nlm.nih.gov/gene/10200
+CENPS	MTMR3	https://www.ncbi.nlm.nih.gov/gene/8897
+CENPS	PEX11B	https://www.ncbi.nlm.nih.gov/gene/8799
+CENPS	RABIF	https://www.ncbi.nlm.nih.gov/gene/5877
+CENPS	RNGTT	https://www.ncbi.nlm.nih.gov/gene/8732
+CENPS	SLC31A2	https://www.ncbi.nlm.nih.gov/gene/1318
+CENPS	STX6	https://www.ncbi.nlm.nih.gov/gene/10228
+CENPS	TK2	https://www.ncbi.nlm.nih.gov/gene/7084
+CENPS	XRCC1	https://www.ncbi.nlm.nih.gov/gene/7515
+FAAP20	ATAD3B	https://www.ncbi.nlm.nih.gov/gene/83858
+FAAP20	ATXN7L3	https://www.ncbi.nlm.nih.gov/gene/56970
+FAAP20	CHTF8	https://www.ncbi.nlm.nih.gov/gene/54921
+FAAP20	MCRIP2	https://www.ncbi.nlm.nih.gov/gene/84331
+FAAP20	PPP1R12C	https://www.ncbi.nlm.nih.gov/gene/54776
+FAAP20	SMIM15	https://www.ncbi.nlm.nih.gov/gene/643155
+FAAP20	TBC1D10A	https://www.ncbi.nlm.nih.gov/gene/83874
+FAAP20	TBC1D14	https://www.ncbi.nlm.nih.gov/gene/57533
+FAAP20	TMEM181	https://www.ncbi.nlm.nih.gov/gene/57583
+FAAP20	WRNIP1	https://www.ncbi.nlm.nih.gov/gene/56897
+FAAP20	ZSWIM7	https://www.ncbi.nlm.nih.gov/gene/125150
+FANCG	PLEKHJ1	https://www.ncbi.nlm.nih.gov/gene/55111
+FANCG	RABGEF1	https://www.ncbi.nlm.nih.gov/gene/27342
+FANCL	ABRAXAS2	https://www.ncbi.nlm.nih.gov/gene/23172
+FANCL	ALG8	https://www.ncbi.nlm.nih.gov/gene/79053
+FANCL	ANKMY2	https://www.ncbi.nlm.nih.gov/gene/57037
+FANCL	ANKRD12	https://www.ncbi.nlm.nih.gov/gene/23253
+FANCL	ANKS1A	https://www.ncbi.nlm.nih.gov/gene/23294
+FANCL	ASF1A	https://www.ncbi.nlm.nih.gov/gene/25842
+FANCL	ASXL1	https://www.ncbi.nlm.nih.gov/gene/171023
+FANCL	C5orf22	https://www.ncbi.nlm.nih.gov/gene/55322
+FANCL	CCDC93	https://www.ncbi.nlm.nih.gov/gene/54520
+FANCL	CEP170B	https://www.ncbi.nlm.nih.gov/gene/283638
+FANCL	CLUAP1	https://www.ncbi.nlm.nih.gov/gene/23059
+FANCL	CNOT4	https://www.ncbi.nlm.nih.gov/gene/4850
+FANCL	COG2	https://www.ncbi.nlm.nih.gov/gene/22796
+FANCL	CRYBG3	https://www.ncbi.nlm.nih.gov/gene/131544
+FANCL	DCUN1D4	https://www.ncbi.nlm.nih.gov/gene/23142
+FANCL	DSTYK	https://www.ncbi.nlm.nih.gov/gene/25778
+FANCL	EP400	https://www.ncbi.nlm.nih.gov/gene/57634
+FANCL	FAM172A	https://www.ncbi.nlm.nih.gov/gene/83989
+FANCL	FIG4	https://www.ncbi.nlm.nih.gov/gene/9896
+FANCL	FRMD4B	https://www.ncbi.nlm.nih.gov/gene/23150
+FANCL	GAB1	https://www.ncbi.nlm.nih.gov/gene/2549
+FANCL	HECTD4	https://www.ncbi.nlm.nih.gov/gene/283450
+FANCL	IQCB1	https://www.ncbi.nlm.nih.gov/gene/9657
+FANCL	LTN1	https://www.ncbi.nlm.nih.gov/gene/26046
+FANCL	MRPS14	https://www.ncbi.nlm.nih.gov/gene/63931
+FANCL	MTMR4	https://www.ncbi.nlm.nih.gov/gene/9110
+FANCL	MTMR6	https://www.ncbi.nlm.nih.gov/gene/9107
+FANCL	NAB1	https://www.ncbi.nlm.nih.gov/gene/4664
+FANCL	NECAP1	https://www.ncbi.nlm.nih.gov/gene/25977
+FANCL	ORC3	https://www.ncbi.nlm.nih.gov/gene/23595
+FANCL	PDS5B	https://www.ncbi.nlm.nih.gov/gene/23047
+FANCL	PLCB1	https://www.ncbi.nlm.nih.gov/gene/23236
+FANCL	PRPF4	https://www.ncbi.nlm.nih.gov/gene/9128
+FANCL	RBL2	https://www.ncbi.nlm.nih.gov/gene/5934
+FANCL	RPA2	https://www.ncbi.nlm.nih.gov/gene/6118
+FANCL	RRP1B	https://www.ncbi.nlm.nih.gov/gene/23076
+FANCL	RSBN1	https://www.ncbi.nlm.nih.gov/gene/54665
+FANCL	SGMS1	https://www.ncbi.nlm.nih.gov/gene/259230
+FANCL	SLC26A2	https://www.ncbi.nlm.nih.gov/gene/1836
+FANCL	SLC9A1	https://www.ncbi.nlm.nih.gov/gene/6548
+FANCL	STXBP3	https://www.ncbi.nlm.nih.gov/gene/6814
+FANCL	SYNJ1	https://www.ncbi.nlm.nih.gov/gene/8867
+FANCL	TAOK3	https://www.ncbi.nlm.nih.gov/gene/51347
+FANCL	TFB2M	https://www.ncbi.nlm.nih.gov/gene/64216
+FANCL	TMCC1	https://www.ncbi.nlm.nih.gov/gene/23023
+FANCL	TOGARAM1	https://www.ncbi.nlm.nih.gov/gene/23116
+FANCL	TP53BP1	https://www.ncbi.nlm.nih.gov/gene/7158
+FANCL	TPGS2	https://www.ncbi.nlm.nih.gov/gene/25941
+FANCL	TSPYL4	https://www.ncbi.nlm.nih.gov/gene/23270
+FANCL	TTI1	https://www.ncbi.nlm.nih.gov/gene/9675
+FANCL	VPS4B	https://www.ncbi.nlm.nih.gov/gene/9525
+FANCL	VRK1	https://www.ncbi.nlm.nih.gov/gene/7443
+FANCL	WDFY3	https://www.ncbi.nlm.nih.gov/gene/23001
+FANCL	ZFYVE26	https://www.ncbi.nlm.nih.gov/gene/23503
+FANCL	ZNF337	https://www.ncbi.nlm.nih.gov/gene/26152
+FANCL	ZZZ3	https://www.ncbi.nlm.nih.gov/gene/26009
+RAD51C	ACTL6A	https://www.ncbi.nlm.nih.gov/gene/86
+RAD51C	AKAP10	https://www.ncbi.nlm.nih.gov/gene/11216
+RAD51C	ALDH3A2	https://www.ncbi.nlm.nih.gov/gene/224
+RAD51C	ATG4B	https://www.ncbi.nlm.nih.gov/gene/23192
+RAD51C	BAZ1B	https://www.ncbi.nlm.nih.gov/gene/9031
+RAD51C	BCL2L1	https://www.ncbi.nlm.nih.gov/gene/598
+RAD51C	BPGM	https://www.ncbi.nlm.nih.gov/gene/669
+RAD51C	BRD1	https://www.ncbi.nlm.nih.gov/gene/23774
+RAD51C	C5orf22	https://www.ncbi.nlm.nih.gov/gene/55322
+RAD51C	CIZ1	https://www.ncbi.nlm.nih.gov/gene/25792
+RAD51C	CNOT4	https://www.ncbi.nlm.nih.gov/gene/4850
+RAD51C	CSTF3	https://www.ncbi.nlm.nih.gov/gene/1479
+RAD51C	CYTH1	https://www.ncbi.nlm.nih.gov/gene/9267
+RAD51C	DUSP11	https://www.ncbi.nlm.nih.gov/gene/8446
+RAD51C	EAPP	https://www.ncbi.nlm.nih.gov/gene/55837
+RAD51C	FKBP15	https://www.ncbi.nlm.nih.gov/gene/23307
+RAD51C	FTSJ1	https://www.ncbi.nlm.nih.gov/gene/24140
+RAD51C	GTF2B	https://www.ncbi.nlm.nih.gov/gene/2959
+RAD51C	ING2	https://www.ncbi.nlm.nih.gov/gene/3622
+RAD51C	LYST	https://www.ncbi.nlm.nih.gov/gene/1130
+RAD51C	MKNK1	https://www.ncbi.nlm.nih.gov/gene/8569
+RAD51C	MTMR3	https://www.ncbi.nlm.nih.gov/gene/8897
+RAD51C	MTMR4	https://www.ncbi.nlm.nih.gov/gene/9110
+RAD51C	NCOA6	https://www.ncbi.nlm.nih.gov/gene/23054
+RAD51C	OXSR1	https://www.ncbi.nlm.nih.gov/gene/9943
+RAD51C	PDS5B	https://www.ncbi.nlm.nih.gov/gene/23047
+RAD51C	PIK3CB	https://www.ncbi.nlm.nih.gov/gene/5291
+RAD51C	PIP4K2C	https://www.ncbi.nlm.nih.gov/gene/79837
+RAD51C	PPP1R8	https://www.ncbi.nlm.nih.gov/gene/5511
+RAD51C	PRPSAP2	https://www.ncbi.nlm.nih.gov/gene/5636
+RAD51C	PYROXD1	https://www.ncbi.nlm.nih.gov/gene/79912
+RAD51C	SEC23B	https://www.ncbi.nlm.nih.gov/gene/10483
+RAD51C	SP2	https://www.ncbi.nlm.nih.gov/gene/6668
+RAD51C	TAOK3	https://www.ncbi.nlm.nih.gov/gene/51347
+RAD51C	TMEM243	https://www.ncbi.nlm.nih.gov/gene/79161
+RAD51C	TP53BP2	https://www.ncbi.nlm.nih.gov/gene/7159
+RAD51C	UNC13B	https://www.ncbi.nlm.nih.gov/gene/10497
+RAD51C	VPS4B	https://www.ncbi.nlm.nih.gov/gene/9525
 

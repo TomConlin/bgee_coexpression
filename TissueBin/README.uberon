@@ -500,4 +500,4 @@ increases associations from  795,149 to 803,356   (gained 8,207)
 these bottom up (one step) merges are nearing diminishing returns 
 try a fourth pass that admits merges more than one hop away
 
-Move to document README
+503 GOTO document README.profile_merge_4
