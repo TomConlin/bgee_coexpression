@@ -2,7 +2,7 @@
 
 0001051 & 0002354 into 0013522
 "hypopharynx" & "subdivision of tube" ->  "cardiac Purkinje fiber"
-	???
+	NO
 
 0002127 & 0002129 into 0019263
 "inferior olivary complex & "cerebellar cortex" -> "gray matter of hindbrain"
@@ -18,7 +18,7 @@
 
 0001728 & 0001737 into 0000072
 "nasopharynx" & "larynx" -> "proximo-distal subdivision of respiratory tract"
-	PROBABLY
+	PROBABLY (if there are other respiratory tract terms then merge further)
 
 0004533 & 0004534 into 0000473
 "left testis" & "right testis" -> "testis"         YES   
@@ -30,7 +30,7 @@
 
 0001906 & 0002736 into 0015233
 "subthalamic nucleus" & "lateral nuclear group of thalamus" -> "nucleus of dorsal thalamus"
-	PROBABLY
+	PROBABLY YES
 
 0004262 into 0001511 !
 "upper leg skin" -> "skin of leg"
@@ -38,14 +38,14 @@
 
 0000995 & 0000996 & 0003889* into 0013515   (fallopian tubes already merged)
 "uterus" & "vagina" & "fallopian tube" -> subdivision of oviduct"
-	MAYBE NOT (too corse?  expressed in reproductive system) 
+	YES (too corse?  expressed in reproductive system) 
 
 0002080 & 0002084 into 0002082  !		                    
                        0002082 & 0002081 into 0004151
 
 "heart right|left ventricle" -> "cardiac ventricle"
 "cardiac ventricle" & "cardiac atrium" -> "cardiac chamber"
-	PROBABLY YES (expeessed in heart)
+	PROBABLY YES (expressed in heart)
 
 0001157 & 0001159 into 0000168
 "transverse colon" & sigmoid colon" -> "proximal-distal subdivision of colon"
@@ -54,7 +54,7 @@
 
 0007106 & 0002331 & 0002450 into 0000478 (0002331 small)
 "chorionic villus" & "umbilical cord" & "decidua" -> "extraembryonic structure"
-	PROBABLY
+	PROBABLY YES
 
 
 0001021 & 0004904 into 0000122  (0004904 small)
@@ -69,7 +69,9 @@
 
 0001765 into 0003244 !
              0003244 & 0003911 into 0010371
-"mammary duct" -> "epithelium of mammary gland"
+"mammary duct" -> "epithelium of mammary gland" 
+	YES
+
 "epithelium of mammary gland" & "choroid plexus epithelium" -> "ecto-epithelium"
 	MAYBE (can I get a second opinion)
 
