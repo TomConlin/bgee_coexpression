@@ -360,7 +360,7 @@ cut -f2 exptissue_parenttissue.txt | sort | uniq -c | sort -nr
       3 UBERON:0005401
 
 Collapsing into Parents of many expressed terms would loose to much informmation 
-also meand ther will be too vague e.g "organ"
+also mean there will be too vague e.g "organ"
 
 dropping parents with more than 10  ...no  5  terms 
 
@@ -422,7 +422,7 @@ grep -v -f strict_singelton_parents.txt exptissue_parenttissue_F1.txt  > exptiss
 
 
 # we have tissue names in 'uberon_term_label.tab'
-# note the lables arerary have quotes embedded so clean them up
+# note the lables  have quotes embedded so clean them up
 
 awk -F'\t' 'BEGIN{print "digraph{rankdir=LR"}FNR==NR{name[$1]=$2}\
 FNR!=NR{print "\"" $2 "\\n" name[$2]"\"-> \"" $1 "\\n" name[$1] "\";"}END{print "}"}' uberon_term_label.tab exptissue_parenttissue_F2.txt | tr -s '"'| sed 's|\\n"|\\n|g' > exptissue_parent_II.gv

@@ -1,1 +1,1 @@
-../BGEE_allpairs.jl
+BGEE_allpairs.jl
